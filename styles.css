@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.hidden {
+    display: none;
+}
+
+.section {
+    margin: 20px;
+}
+
+#app {
+    max-width: 600px;
+    margin: auto;
+}
+
+label, input {
+    display: block;
+    margin: 10px 0;
+}
+
+button {
+    margin: 10px 0;
+}

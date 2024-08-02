@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clabor Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="setup" class="section">
+            <label for="targetScore">До скольки очков игра? (501 или 1001):</label>
+            <input type="text" id="targetScore">
+            <label for="playerCount">Количество игроков:</label>
+            <input type="text" id="playerCount">
+            <button id="startSetup">Начать игру</button>
+        </div>
+
+        <div id="nameInput" class="section hidden">
+            <div id="playerNames"></div>
+            <button id="startGame">Начать партию</button>
+        </div>
+
+        <div id="game" class="section hidden">
+            <label id="dealerLabel"></label>
+            <label for="chooser">Кто выбирал масть?</label>
+            <input type="text" id="chooser">
+            <div id="scoreInputs"></div>
+            <button id="nextRound">Следующая партия</button>
+            <div id="scoreBoard"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
