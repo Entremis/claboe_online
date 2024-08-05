@@ -35,14 +35,20 @@ document.getElementById('startGame').addEventListener('click', () => {
     }
 
     document.getElementById('nameInput').classList.add('hidden');
-    document.getElementById('game').classList.remove('hidden');
-    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('gameTabs').classList.remove('hidden');
+    document.getElementById('game').classList.add('active');
 
     updateGameUI();
 });
 
 document.getElementById('nextRound').addEventListener('click', () => {
-    chooserIndex = parseInt(document.getElementById('chooser').value) - 1;
+    const chooserCheckboxes = document.querySelectorAll('.chooserCheckbox');
+    chooserCheckboxes.forEach((checkbox, index) => {
+        if (checkbox.checked) {
+            chooserIndex = index;
+        }
+    });
+
     const roundScores = [];
     for (let i = 0; i < playerNames.length; i++) {
         roundScores[i] = parseInt(document.getElementById(`score${i}`).value);
@@ -58,17 +64,19 @@ document.getElementById('nextRound').addEventListener('click', () => {
         }
     }
 
+    let currentRoundPenalties = Array(playerNames.length).fill(0);
     if (roundScores[chooserIndex] < maxScore) {
         penalties[chooserIndex]++;
+        currentRoundPenalties[chooserIndex] = penalties[chooserIndex];
         if (penalties[chooserIndex] >= 3) {
             scores[chooserIndex] -= 100;
         }
-        scores[maxIndex] += roundScores[chooserIndex]; // Добавляем очки chooser к maxIndex
+        scores[maxIndex] += roundScores[chooserIndex];
     }
 
     for (let i = 0; i < playerNames.length; i++) {
         if (i !== chooserIndex || roundScores[chooserIndex] >= maxScore) {
-            scores[i] += roundScores[i]; // добавляем очки, кроме случая, когда chooser набрал меньше очков
+            scores[i] += roundScores[i];
         }
     }
 
@@ -102,8 +110,12 @@ function updateGameUI() {
         label.textContent = `Введите количество очков для игрока ${playerNames[i]} (${i + 1}):`;
         const input = document.createElement('input');
         input.id = `score${i}`;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.classList.add('chooserCheckbox');
         scoreInputsDiv.appendChild(label);
         scoreInputsDiv.appendChild(input);
+        scoreInputsDiv.appendChild(checkbox);
     }
 
     const scoreBoardDiv = document.getElementById('scoreBoard');
@@ -119,16 +131,19 @@ function updateResultsTable() {
     const resultsTableBody = document.getElementById('resultsTable').querySelector('tbody');
     resultsTableBody.innerHTML = '';
 
+    recalculatePenalties();
+    recalculateScoresAndPenalties();
+
     roundResults.forEach((result, roundIndex) => {
         result.scores.forEach((score, playerIndex) => {
-            const finalScore = calculateFinalScore(score, result.penalties[playerIndex], result, playerIndex);
+            const finalScore = calculateFinalScore(score, result.penalties[playerIndex], roundIndex, playerIndex);
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${roundIndex + 1}</td>
                 <td>${playerNames[playerIndex]} (${playerIndex + 1})</td>
                 <td><input type="text" value="${score}" data-round="${roundIndex}" data-player="${playerIndex}" class="scoreInput"></td>
                 <td>${finalScore}</td>
-                <td>${penalties[playerIndex]}</td>
+                <td>${result.penalties[playerIndex]}</td>
                 <td><button class="editButton" data-round="${roundIndex}" data-player="${playerIndex}">Редактировать</button></td>
             `;
             resultsTableBody.appendChild(row);
@@ -150,15 +165,22 @@ function updateResultsTable() {
     });
 }
 
-function calculateFinalScore(score, penalty, result, playerIndex) {
-    let finalScore = scores[playerIndex]; // изменил здесь для использования итогового счета
+function calculateFinalScore(score, penalty, roundIndex, playerIndex) {
+    let finalScore = calculateCumulativeScore(roundIndex, playerIndex);
     if (penalty >= 3) {
         finalScore -= 100;
-    }
-    if (result.chooserIndex === playerIndex && result.scores[playerIndex] < Math.max(...result.scores)) {
+    } else if (penalty > 0) {
         finalScore = 0;
     }
     return finalScore;
+}
+
+function calculateCumulativeScore(roundIndex, playerIndex) {
+    let cumulativeScore = 0;
+    for (let i = 0; i <= roundIndex; i++) {
+        cumulativeScore += roundResults[i].scores[playerIndex];
+    }
+    return cumulativeScore;
 }
 
 function recalculateScoresAndPenalties() {
@@ -181,12 +203,12 @@ function recalculateScoresAndPenalties() {
             if (penalties[result.chooserIndex] >= 3) {
                 scores[result.chooserIndex] -= 100;
             }
-            scores[maxIndex] += result.scores[result.chooserIndex]; // добавляем очки chooser к maxIndex
+            scores[maxIndex] += result.scores[result.chooserIndex];
         }
 
         for (let i = 0; i < playerNames.length; i++) {
             if (i !== result.chooserIndex || result.scores[result.chooserIndex] >= maxScore) {
-                scores[i] += result.scores[i]; // добавляем очки, кроме случая, когда chooser набрал меньше очков
+                scores[i] += result.scores[i];
             }
         }
     });
@@ -209,5 +231,19 @@ function recalculatePenalties() {
         if (result.scores[result.chooserIndex] < maxScore) {
             penalties[result.chooserIndex]++;
         }
+        result.penalties = [...penalties];
     });
 }
+
+// Вкладки для переключения
+document.querySelectorAll('.tablink').forEach(button => {
+    button.addEventListener('click', (event) => {
+        document.querySelectorAll('.tablink').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tabcontent').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tabcontent').forEach(tab => tab.classList.add('hidden'));
+
+        event.target.classList.add('active');
+        document.getElementById(event.target.dataset.tab).classList.add('active');
+        document.getElementById(event.target.dataset.tab).classList.remove('hidden');
+    });
+});
