@@ -4,12 +4,12 @@ window.onload = function() {
     playerNames.forEach(function(name, index) {
         var div = document.createElement('div');
         div.innerHTML = '<label>' + (index + 1) + ' ' + name + '</label>' +
-                        '<input type="radio" name="played' + index + '" value="Да"> Выбирал масть' +
-                        '<input type="radio" name="played' + index + '" value="Нет" checked> Не выбирал масть' +
+                        '<input type="radio" name="played" value="' + index + '"> Выбирал масть' +
                         '<input type="number" name="score' + index + '" placeholder="Очки">';
         gameForm.appendChild(div);
     });
     updateDealer();
+    updateResults();
 };
 
 function recordScores() {
@@ -19,8 +19,8 @@ function recordScores() {
     var scores = [];
 
     playerNames.forEach(function(name, index) {
-        var score = parseInt(document.querySelector('input[name="score' + index + '"]').value, 10);
-        var played = document.querySelector('input[name="played' + index + '"]:checked').value;
+        var score = parseInt(document.querySelector('input[name="score' + index + '"]').value, 10) || 0;
+        var played = document.querySelector('input[name="played"]:checked') ? (document.querySelector('input[name="played"]:checked').value == index ? 'Да' : 'Нет') : 'Нет';
         scores.push({ name: name, score: score, played: played });
     });
 
@@ -52,8 +52,16 @@ function recordScores() {
         newCell = newRow.insertCell();
         newCell.innerHTML = `<button onclick="saveChanges(this)">Сохранить</button>`;
     });
+
     updateDealer();
     recalculateAllScores();
+    updateResults();
+    resetForm();
+}
+
+function resetForm() {
+    var gameForm = document.getElementById('gameForm');
+    gameForm.reset();
 }
 
 function calculateFinalScore(scoreTable, player, scores, currentRound) {
@@ -106,6 +114,7 @@ function saveChanges(button) {
     updateRow(round, playerName, newScore, newPlayed);
     recalculateBeitFromRound(round);
     recalculateAllScores();
+    updateResults();
 }
 
 function handleInputChange(input) {
@@ -113,6 +122,7 @@ function handleInputChange(input) {
     var round = parseInt(row.cells[0].innerText, 10);
     recalculateBeitFromRound(round);
     recalculateAllScores();
+    updateResults();
 }
 
 function updateRow(round, playerName, newScore, newPlayed) {
@@ -201,4 +211,31 @@ function openTab(tabName) {
         x[i].style.display = "none";
     }
     document.getElementById(tabName).style.display = "block";
+}
+
+function updateResults() {
+    var scoreTable = document.getElementById('scoreTable').getElementsByTagName('tbody')[0];
+    var playerNames = JSON.parse(localStorage.getItem('playerNames'));
+    var resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    playerNames.forEach(function(name, index) {
+        var lastScore = 0;
+        var maxBeit = 0;
+
+        for (var i = 0; i < scoreTable.rows.length; i++) {
+            var row = scoreTable.rows[i];
+            if (row.cells[1].innerText === name) {
+                lastScore = parseInt(row.cells[3].innerText, 10);
+                var beit = row.cells[4].innerText === '-' ? 0 : parseInt(row.cells[4].innerText, 10);
+                if (beit > maxBeit) {
+                    maxBeit = beit;
+                }
+            }
+        }
+
+        var resultItem = document.createElement('div');
+        resultItem.innerText = (index + 1) + ' Очки: ' + lastScore + ', Бейт: ' + maxBeit;
+        resultsDiv.appendChild(resultItem);
+    });
 }
