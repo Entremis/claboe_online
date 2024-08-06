@@ -3,7 +3,7 @@ window.onload = function() {
     var gameForm = document.getElementById('gameForm');
     playerNames.forEach(function(name, index) {
         var div = document.createElement('div');
-        div.innerHTML = '<label>' + (index + 1) + ' ' + name + '</label>' +
+        div.innerHTML = '<label>' + name + '</label>' +
                         '<input type="radio" name="played" value="' + index + '"> Выбирал масть' +
                         '<input type="number" name="score' + index + '" placeholder="Очки">';
         gameForm.appendChild(div);
@@ -235,7 +235,7 @@ function updateResults() {
         }
 
         var resultItem = document.createElement('div');
-        resultItem.innerText = (index + 1) + ' Очки: ' + lastScore + ', Бейт: ' + maxBeit;
+        resultItem.innerText = name + ' Очки: ' + lastScore + ', Бейт: ' + maxBeit;
         resultsDiv.appendChild(resultItem);
     });
 }
