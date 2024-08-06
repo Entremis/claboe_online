@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Игра Клабор</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h2>Игра</h2>
+<div class="tabs">
+    <button class="tab-button" onclick="openTab('game')">Игра</button>
+    <button class="tab-button" onclick="openTab('scores')">Детальный счет</button>
+</div>
+
+<div id="game" class="tab-content">
+    <h3>Раздает игрок: <span id="dealerName"></span></h3>
+    <form id="gameForm">
+        <!-- Динамически добавляемые элементы управления для каждого игрока -->
+    </form>
+    <button onclick="recordScores()">Записать очки</button>
+</div>
+
+<div id="scores" class="tab-content" style="display:none;">
+    <h3>Детальный счет</h3>
+    <table id="scoreTable">
+        <thead>
+            <tr>
+                <th>Партия</th>
+                <th>Игрок</th>
+                <th>Набранные очки</th>
+                <th>Итоговые очки</th> <!-- Новая колонка -->
+                <th>Бейт</th>
+                <th>Играл</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Динамически добавляемые строки таблицы -->
+        </tbody>
+    </table>
+    <button onclick="recalculateAllScores()">Пересчитать игру</button>
+</div>
+
+<script src="game_logic.js"></script>
+</body>
+</html>

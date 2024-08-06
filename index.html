@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Настройка игры Клабор</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h2>Настройка игры</h2>
+<form id="gameSetup">
+    <p>Размер игры:</p>
+    <input type="radio" id="score501" name="gameSize" value="501" checked>
+    <label for="score501">501</label>
+    <input type="radio" id="score1001" name="gameSize" value="1001">
+    <label for="score1001">1001</label>
+
+    <h3>Введите имена игроков:</h3>
+    <div id="playerNames">
+        <input type="text" name="playerName" placeholder="Имя игрока">
+        <input type="text" name="playerName" placeholder="Имя игрока">
+        <input type="text" name="playerName" placeholder="Имя игрока">
+    </div>
+    <button type="button" onclick="addPlayer()">+</button>
+    <button type="submit">Начать игру</button>
+</form>
+
+<script src="setup.js"></script>
+</body>
+</html>
